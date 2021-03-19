@@ -33,14 +33,13 @@ def extending(x):
             divisor = int(coordinate[coordinate.find('/')+1:])
             divisors.append(divisor)
     max_divisor = max(divisors)
-    i = 0
     while True:
+        i = 0
         for divisor in divisors:
-            if max_divisor % divisor != 0:
-                break
+            if max_divisor % divisor == 0:
+                i += 1
+        if i == len(divisors):
             sup = max_divisor
-            i = 1
-        if i == 1:
             break
         max_divisor += 1
     new_x_coordinates = []
