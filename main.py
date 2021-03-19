@@ -1,24 +1,31 @@
-"""
-Напишите программу, получающую на вход несколько векторов одной размерности и
-строящую ортогональный базис подпространства, натянутого на данную систему векторов,
-используя алгоритм Грама-Шмидта. Окончанием ввода будет считаться пустая строка.
-"""
-
-
 def main():
+    """
+    Main function
+    :return: None
+    """
     vectors = pool()
     basis = magic(vectors)
     output(basis)
 
 
-def if_numbers(s):
-    for ltr in s:
+def if_numbers(x):
+    """
+    Checks whether vector's coordinates are numbers
+    :param x: vector
+    :return: 1 as True and 0 as False
+    """
+    for ltr in x:
         if not (ltr == '(' or ltr == ')' or ltr == ',' or ltr == ' ' or ltr.isdigit() or ltr == '-' or ltr == '/'):
             return 0
     return 1
 
 
 def extending(x):
+    """
+    Extends a vector with rational fractions coordinates in order to gain integer numbers
+    :param x: extendable vector
+    :return: extended vector
+    """
     divisors = []
     x_coordinates = x[1:-1].split(',')
     for coordinate in x_coordinates:
@@ -26,23 +33,24 @@ def extending(x):
             divisor = int(coordinate[coordinate.find('/')+1:])
             divisors.append(divisor)
     max_divisor = max(divisors)
+    i = 0
     while True:
-        i = 0
         for divisor in divisors:
             if max_divisor % divisor != 0:
                 break
-            least_common_multiple = max_divisor
+            sup = max_divisor
             i = 1
         if i == 1:
             break
         max_divisor += 1
     new_x_coordinates = []
     for coordinate in x_coordinates:
-        if coordinate.find('/') != -1:
-            new_coordinate = int(float(coordinate[:coordinate.find('/')])/float(coordinate[coordinate.find('/')+1:]))
-            new_x_coordinates.append(new_coordinate*least_common_multiple)
+        c_find = coordinate.find('/')
+        if c_find != -1:
+            new_coordinate = int((float(coordinate[:c_find])/float(coordinate[c_find+1:]))*sup)
+            new_x_coordinates.append(new_coordinate)
         else:
-            new_x_coordinates.append(coordinate*least_common_multiple)
+            new_x_coordinates.append(int(coordinate)*sup)
     y = '('
     for coordinate in new_x_coordinates:
         y += str(coordinate) + ','
@@ -50,32 +58,40 @@ def extending(x):
 
 
 def pool():
+    """
+    Creates vector pool
+    :return: vector pool
+    """
     vectors = []
-    s = input('Введите первый вектор системы, его размерность будет определяющей:\n')
-    dimension_s = s.count(',') + 1
+    x = input('Введите первый вектор системы, его размерность будет определяющей:\n')
+    dimension_x = x.count(',') + 1
     while True:
-        if s == '':
+        if x == '':
             break
-        elif s.count(',') + 1 != dimension_s:
+        elif x.count(',') + 1 != dimension_x:
             print('Повторите попытку: векторы не могут иметь разную размерность.')
-        elif if_numbers(s) == 0:
-            print('Повторите попытку: вектор содержит нечисленные значения.')
-        elif s[0] != '(' or s[-1] != ')':
-            print('Повторите попытку: ошибка в вводе')
+        elif if_numbers(x) == 0 or x[0] != '(' or x[-1] != ')':
+            print('Повторите попытку: ошибка ввода')
         else:
-            if s.find('/') != -1:
-                s = extending(s)
-            vector = s.replace(' ', '')
+            if x.find('/') != -1:
+                x = extending(x)
+            vector = x.replace(' ', '')
             check = vector[:-1] + ','
-            if check.count('0,') == dimension_s:
+            if check.count('0,') == dimension_x:
                 print('Повторите попытку: введен нулевой вектор.')
             else:
                 vectors.append(vector)
-        s = input()
+        x = input()
     return vectors
 
 
 def vector_difference(x, y):
+    """
+    Vector subtraction operation
+    :param x: decreasing vector
+    :param y: subtracted vector
+    :return: result of a subtraction
+    """
     result = '('
     x_coordinates = x[1:-1].split(',')
     y_coordinates = y[1:-1].split(',')
@@ -84,8 +100,14 @@ def vector_difference(x, y):
     return result[:-1] + ')'
 
 
-def multiplication(scalar, vector):
-    coordinates = vector[1:-1].split(',')
+def multiplication(scalar, x):
+    """
+    Operation of multiplication of a vector by a scalar number
+    :param scalar: scalar number
+    :param x: vector being multiplied
+    :return: multiplied vector
+    """
+    coordinates = x[1:-1].split(',')
     out = '('
     for coordinate in coordinates:
         out += str(int(scalar) * int(coordinate)) + ','
@@ -93,6 +115,12 @@ def multiplication(scalar, vector):
 
 
 def scalar_multiplication(x, y):
+    """
+    Scalar multiplication operation (between vectors)
+    :param x: first vector
+    :param y: second vector
+    :return: result
+    """
     result = 0
     x_coordinates = x[1:-1].split(',')
     y_coordinates = y[1:-1].split(',')
@@ -102,10 +130,22 @@ def scalar_multiplication(x, y):
 
 
 def projection(x, y):
+    """
+    The operator of the projection of a vector x onto a vector y
+    :param x: vector x
+    :param y: vector y
+    :return: projection of a vector x onto a vector y
+    """
     return multiplication((scalar_multiplication(x, y)/scalar_multiplication(y, y)), y)
 
 
 def process(x, basis):
+    """
+    Gram–Schmidt process
+    :param x: vector being orthogonalized
+    :param basis: orthogonal vector system
+    :return: orthogonalized vector
+    """
     in_work = x
     for second_layer in range(len(basis)):
         in_work = vector_difference(in_work, projection(x, basis[second_layer]))
@@ -113,6 +153,12 @@ def process(x, basis):
 
 
 def magic(vectors):
+    """
+    Orthogonalizes vectors
+    Hogwarts' strongest spell (•◡•)
+    :param vectors: vectors being orthogonalized
+    :return: orthogonalized basis
+    """
     basis = [vectors[0]]
     for first_layer in range(1, len(vectors)):
         x = vectors[first_layer]
@@ -124,10 +170,15 @@ def magic(vectors):
 
 
 def output(basis):
+    """
+    Prints orthogonalized basis
+    :param basis: basis
+    :return: None
+    """
     print('Ортогональный базис подпространства:')
     for item in basis:
         item = item.replace(',', ', ')
         print(item)
 
 
-print(extending(input()))
+main()
