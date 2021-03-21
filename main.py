@@ -64,6 +64,11 @@ def fraction_extending(x):
 
 
 def decimal_extending(x):
+    """
+    Extends a vector with decimal fractions coordinates in order to gain integer numbers
+    :param x: extendable vector
+    :return: extended vector
+    """
     quantity = []
     x_coordinates = x[1:-1].split(',')
     for coordinate in x_coordinates:
@@ -187,7 +192,10 @@ def magic(vectors):
         y = process(x, basis)
         check = y[:-1] + ','
         if check.count('0,') != check.count(','):
-            basis.append(y)
+            if y.find('/') != -1:
+                basis.append(fraction_extending(y))
+            else:
+                basis.append(y)
     return basis
 
 
