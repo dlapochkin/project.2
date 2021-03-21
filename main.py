@@ -1,5 +1,8 @@
-# Project 2
-# Developer: Lapochkin D.
+"""
+Project 2
+Developer: Lapochkin D.
+"""
+import fractions
 
 
 def main():
@@ -19,12 +22,12 @@ def if_numbers(x):
     :return: 1 as True and 0 as False
     """
     for ltr in x:
-        if not (ltr == '(' or ltr == ')' or ltr == ',' or ltr == ' ' or ltr.isdigit() or ltr == '-' or ltr == '/'):
+        if not (ltr == '(' or ltr == ')' or ltr == ',' or ltr == ' ' or ltr.isdigit() or ltr == '-' or ltr == '/' or ltr == '.'):
             return 0
     return 1
 
 
-def extending(x):
+def fraction_extending(x):
     """
     Extends a vector with rational fractions coordinates in order to gain integer numbers
     :param x: extendable vector
@@ -60,6 +63,20 @@ def extending(x):
     return y[:-1] + ')'
 
 
+def decimal_extending(x):
+    quantity = []
+    x_coordinates = x[1:-1].split(',')
+    for coordinate in x_coordinates:
+        if coordinate.find('.') != -1:
+            n = len(coordinate[coordinate.find('.')+1:])
+            quantity.append(n)
+    n = max(quantity)
+    y = '('
+    for coordinate in x_coordinates:
+        y += str(int(float(coordinate) * (10 ** n))) + ','
+    return y[:-1] + ')'
+
+
 def pool():
     """
     Creates vector pool
@@ -71,13 +88,15 @@ def pool():
     while True:
         if x == '':
             break
-        elif x.count(',') + 1 != dimension_x:
-            print('Повторите попытку: векторы не могут иметь разную размерность.')
         elif if_numbers(x) == 0 or x[0] != '(' or x[-1] != ')':
             print('Повторите попытку: ошибка ввода')
+        elif x.count(',') + 1 != dimension_x:
+            print('Повторите попытку: векторы не могут иметь разную размерность.')
         else:
             if x.find('/') != -1:
-                x = extending(x)
+                x = fraction_extending(x)
+            if x.find('.') != -1:
+                x = decimal_extending(x)
             vector = x.replace(' ', '')
             check = vector[:-1] + ','
             if check.count('0,') == dimension_x:
@@ -99,7 +118,7 @@ def vector_difference(x, y):
     x_coordinates = x[1:-1].split(',')
     y_coordinates = y[1:-1].split(',')
     for n in range(len(x_coordinates)):
-        result += str(int(x_coordinates[n]) - int(y_coordinates[n])) + ','
+        result += str(int(x_coordinates[n]) - int(float(y_coordinates[n]))) + ','
     return result[:-1] + ')'
 
 
@@ -112,8 +131,14 @@ def multiplication(scalar, x):
     """
     coordinates = x[1:-1].split(',')
     out = '('
-    for coordinate in coordinates:
-        out += str(int(scalar) * int(coordinate)) + ','
+    if scalar.find('/') != -1:
+        numerator = int(scalar[:scalar.find('/')])
+        denominator = int(scalar[scalar.find('/')+1])
+        for coordinate in coordinates:
+            out += str(int(fractions.Fraction(numerator, denominator) * int(coordinate))) + ','
+    else:
+        for coordinate in coordinates:
+            out += str(float(scalar) * int(coordinate)) + ','
     return out[:-1] + ')'
 
 
@@ -139,7 +164,7 @@ def projection(x, y):
     :param y: vector y
     :return: projection of a vector x onto a vector y
     """
-    return multiplication((scalar_multiplication(x, y)/scalar_multiplication(y, y)), y)
+    return multiplication(str(fractions.Fraction(scalar_multiplication(x, y), scalar_multiplication(y, y))), y)
 
 
 def process(x, basis):
