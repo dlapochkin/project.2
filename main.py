@@ -118,7 +118,7 @@ def vector_difference(x, y):
     x_coordinates = x[1:-1].split(',')
     y_coordinates = y[1:-1].split(',')
     for n in range(len(x_coordinates)):
-        result += str(int(x_coordinates[n]) - int(float(y_coordinates[n]))) + ','
+        result += str(fractions.Fraction(x_coordinates[n]) - fractions.Fraction(y_coordinates[n])) + ','
     return result[:-1] + ')'
 
 
@@ -131,14 +131,8 @@ def multiplication(scalar, x):
     """
     coordinates = x[1:-1].split(',')
     out = '('
-    if scalar.find('/') != -1:
-        numerator = int(scalar[:scalar.find('/')])
-        denominator = int(scalar[scalar.find('/')+1])
-        for coordinate in coordinates:
-            out += str(int(fractions.Fraction(numerator, denominator) * int(coordinate))) + ','
-    else:
-        for coordinate in coordinates:
-            out += str(float(scalar) * int(coordinate)) + ','
+    for coordinate in coordinates:
+        out += str(fractions.Fraction(scalar) * fractions.Fraction(coordinate)) + ','
     return out[:-1] + ')'
 
 
@@ -153,7 +147,7 @@ def scalar_multiplication(x, y):
     x_coordinates = x[1:-1].split(',')
     y_coordinates = y[1:-1].split(',')
     for n in range(len(x_coordinates)):
-        result += int(x_coordinates[n]) * int(y_coordinates[n])
+        result += fractions.Fraction(x_coordinates[n]) * fractions.Fraction(y_coordinates[n])
     return result
 
 
