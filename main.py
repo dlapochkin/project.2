@@ -1,3 +1,7 @@
+# Project 2
+# Developer: Lapochkin D.
+
+
 def main():
     """
     Main function
